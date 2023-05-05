@@ -5,7 +5,7 @@ with open("README.md", "r") as readme_file:
 
 setup(
     name="remla-lib-release",
-    version="0.0.3",
+    version="0.0.4",
     description="A version-aware library for REMLA12 project",
     long_description=long_description,
     long_description_content_type="text/markdown",
