@@ -4,7 +4,7 @@ with open("README.md", "r") as readme_file:
     long_description = readme_file.read()
 
 setup(
-    name="remlateam12",
+    name="remla-lib-12",
     version="0.0.1",
     description="A version-aware library for REMLA12 project",
     long_description=long_description,
