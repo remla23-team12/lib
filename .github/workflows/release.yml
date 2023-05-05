@@ -80,7 +80,7 @@ jobs:
           # Publish package
           twine upload dist/*
   create_release:
-    needs: build_and_publish
+    needs: [update_version, build_and_publish]
     runs-on: ubuntu-latest
     steps:
       - name: Create GitHub Release
