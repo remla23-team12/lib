@@ -3,8 +3,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'README.md'
 jobs:
-  build_and_publish:
+  update_version:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -16,22 +18,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.x
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install setuptools wheel twine
-      - name: Build and publish
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          # Build package
-          python setup.py sdist bdist_wheel
-          
-          # Publish package
-          twine upload dist/*
       - name: Update version
-        if: github.actor != 'github-actions[bot]'
         run: |
           VERSION=$(git describe --tags --abbrev=0)
           echo "Current version is $(grep '__version__' __init__.py)"
@@ -46,10 +33,43 @@ jobs:
 
           sed -i "s/__version__ = .*/__version__ = \"$NEW_VERSION\"/g" __init__.py
           echo "New version is $(grep '__version__' __init__.py)"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+          # Update version in setup.py
+          sed -i "s/version=.*/version=\"$NEW_VERSION\",/g" setup.py
+          echo "New version is $(grep 'version=' setup.py)"
           
           # Commit version update
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add __init__.py
+          git add __init__.py setup.py
           git commit -m "Update version to $NEW_VERSION"
-          git push origin main
+          git tag $NEW_VERSION
+          git push origin main --follow-tags
+  build_and_publish:
+    needs: update_version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          # Build package
+          python setup.py sdist bdist_wheel
+          
+          # Publish package
+          twine upload dist/*
+  create_release:
+    needs: build_and_publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        with:
+          tag_name: ${{ $NEW_VERSION }}
+          release_name: Release ${{ Release v$NEW_VERSION}}
+          draft: false
+          prerelease: false
