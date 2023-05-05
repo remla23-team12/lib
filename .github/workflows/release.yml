@@ -88,7 +88,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           OUTPUT: ${{ needs.update_version.outputs.new_version }}
         with:
-          tag_name: ${{ $OUTPUT }}
-          release_name: Release ${{ $OUTPUT }}
+          tag_name: ${{ OUTPUT }}
+          release_name: Release ${{ OUTPUT }}
           draft: false
           prerelease: false
