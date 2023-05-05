@@ -86,9 +86,8 @@ jobs:
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-          OUTPUT: ${{ needs.update_version.outputs.new_version }}
         with:
-          tag_name: ${{ OUTPUT }}
-          release_name: Release ${{ OUTPUT }}
+          tag_name: ${{ needs.update_version.outputs.new_version  }}
+          release_name: Release ${{ needs.update_version.outputs.new_version  }}
           draft: false
           prerelease: false
