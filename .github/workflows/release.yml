@@ -54,6 +54,11 @@ jobs:
     needs: update_version
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
