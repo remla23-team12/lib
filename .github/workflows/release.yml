@@ -1,0 +1,55 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          # Build package
+          python setup.py sdist bdist_wheel
+          
+          # Publish package
+          twine upload dist/*
+      - name: Update version
+        if: github.actor != 'github-actions[bot]'
+        run: |
+          VERSION=$(git describe --tags --abbrev=0)
+          echo "Current version is $(grep '__version__' __init__.py)"
+
+          IFS='.' read -ra VERSION_PARTS <<< "$VERSION"
+
+          LAST_INDEX=$(( ${#VERSION_PARTS[@]} - 1 ))
+          VERSION_PARTS[$LAST_INDEX]=$((${VERSION_PARTS[$LAST_INDEX]} + 1))
+
+          NEW_VERSION=$(IFS=. ; echo "${VERSION_PARTS[*]}")
+          echo "New version is $NEW_VERSION"
+
+          sed -i "s/__version__ = .*/__version__ = \"$NEW_VERSION\"/g" __init__.py
+          echo "New version is $(grep '__version__' __init__.py)"
+          
+          # Commit version update
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add __init__.py
+          git commit -m "Update version to $NEW_VERSION"
+          git push origin main
