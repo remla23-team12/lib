@@ -9,7 +9,7 @@ jobs:
   update_version:
     runs-on: ubuntu-latest
     outputs:
-      new_version: ${{ steps.set_version.outputs.new_version }}
+      new_version: ${{ steps.update.outputs.new_version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -20,7 +20,8 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.x
-      - name: Update version
+      - id: update
+        name: Update version
         run: |
           VERSION=$(git describe --tags --abbrev=0)
           echo "Current version is $(grep '__version__' __init__.py)"
@@ -49,7 +50,7 @@ jobs:
           git tag $NEW_VERSION
           git push origin main --follow-tags
 
-          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
   build_and_publish:
     needs: update_version
     runs-on: ubuntu-latest
@@ -85,8 +86,9 @@ jobs:
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          OUTPUT: ${{ needs.update_version.outputs.new_version }}
         with:
-          tag_name: ${{ needs.update_version.outputs.new_version }}
-          release_name: Release ${{ needs.update_version.outputs.new_version }}
+          tag_name: ${{ $OUTPUT }}
+          release_name: Release ${{ $OUTPUT }}
           draft: false
           prerelease: false
