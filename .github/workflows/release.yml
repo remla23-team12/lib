@@ -23,7 +23,7 @@ jobs:
       - id: update
         name: Update version
         run: |
-          VERSION=$(git describe --tags --abbrev=0)
+          VERSION=$(grep -oP 'Release \K.*' README.md)
           echo "Current version is $(grep '__version__' __init__.py)"
 
           IFS='.' read -ra VERSION_PARTS <<< "$VERSION"
