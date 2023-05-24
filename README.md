@@ -5,4 +5,4 @@ The lib repository requires a library that the app repository will depend on. Th
 Changing the below number by incrementing the PATCH version + 1 will trigger the automated workflow (e.g., 0.0.5 --> 0.0.6)
 Note: you need to change init.py,readme,setup 
 
-Release 0.0.10
+Release 0.1.0
