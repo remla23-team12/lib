@@ -4,4 +4,4 @@ The lib repository requires a library that the app repository will depend on. Th
 
 Changing the below number by incrementing the PATCH version + 1 will trigger the automated workflow (e.g., 0.0.5 --> 0.0.6)
 
-Release 0.0.4
+Release 0.0.6

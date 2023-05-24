@@ -1,4 +1,4 @@
 from version_util import VersionUtil
 
-__version__ = "2"
+__version__ = "0.0.6"
 version_util = VersionUtil(__version__)
