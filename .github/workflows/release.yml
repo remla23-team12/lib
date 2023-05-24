@@ -31,24 +31,6 @@ jobs:
           NEW_VERSION=$(IFS=. ; echo "${VERSION_PARTS[*]}")
           echo "New version is $NEW_VERSION"
 
-          sed -i "s/__version__ = .*/__version__ = \"$NEW_VERSION\"/g" __init__.py
-          echo "New version is $(grep '__version__' __init__.py)"
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-
-          # Update version in setup.py
-          sed -i "s/version=.*/version=\"$NEW_VERSION\",/g" setup.py
-          echo "New version is $(grep 'version=' setup.py)"
-          
-          # Commit version update
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add __init__.py setup.py
-          git commit -m "Update version to $NEW_VERSION"
-          git tag $NEW_VERSION
-          git push origin main --follow-tags
-
-          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
-          echo "::set-output name=new_version::$NEW_VERSION"
   build_and_publish:
     needs: update_version
     runs-on: ubuntu-latest
