@@ -28,9 +28,6 @@ jobs:
 
           IFS='.' read -ra VERSION_PARTS <<< "$VERSION"
 
-          # LAST_INDEX=$(( ${#VERSION_PARTS[@]} - 1 ))
-          # VERSION_PARTS[$LAST_INDEX]=$((${VERSION_PARTS[$LAST_INDEX]} + 1))
-
           NEW_VERSION=$(IFS=. ; echo "${VERSION_PARTS[*]}")
           echo "New version is $NEW_VERSION"
 
